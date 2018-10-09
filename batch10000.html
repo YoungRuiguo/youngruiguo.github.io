@@ -1,0 +1,255 @@
+
+<!doctype html>
+<html>
+
+<head>
+	<title>Line Chart</title>
+	<script src="Chart.bundle.js"></script>
+	<script src="utils.js"></script>
+	<style>
+	canvas{
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+</head>
+
+<body>
+	<div style="width:75%;">
+		<canvas id="canvas"></canvas>
+	</div>
+	<br>
+	<br>
+	<!-- <button id="randomizeData">Randomize Data</button>
+	<button id="addDataset">Add Dataset</button>
+	<button id="removeDataset">Remove Dataset</button>
+	<button id="addData">Add Data</button>
+	<button id="removeData">Remove Data</button> -->
+	<script>
+		var LOOP = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+		var config = {
+			type: 'line',
+			data: {
+				labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+				datasets: [{
+					label: 'No Batch 10000',
+					fill: false,
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: [
+            0.000620659,
+            0.000600439,
+            0.000581055,
+            0.000605455,
+            0.000566386,
+            0.000547681,
+            0.000567346,
+            0.000645477,
+            0.000595274,
+            0.000571975
+					],
+				}, {
+					label: 'Batch 10000(10)',
+					fill: false,
+					backgroundColor: window.chartColors.orange,
+					borderColor: window.chartColors.orange,
+					data: [
+            0.000337603,
+            0.000342632,
+            0.000416544,
+            0.000447999,
+            0.000328244,
+            0.000357154,
+            0.000383593,
+            0.000365528,
+            0.000348561,
+            0.000381612
+					],
+				}, {
+					label: 'Batch 10000(100)',
+					fill: false,
+					backgroundColor: window.chartColors.yellow,
+					borderColor: window.chartColors.yellow,
+					data: [
+            0.00040463,
+            0.000403876,
+            0.000390218,
+            0.000387296,
+            0.000421933,
+            0.000488307,
+            0.000377871,
+            0.000462159,
+            0.000383139,
+            0.000415227
+					],
+				}, {
+					label: 'Batch 10000(500)',
+					fill: false,
+					backgroundColor: window.chartColors.green,
+					borderColor: window.chartColors.green,
+					data: [
+            0.00047205,
+            0.00042562,
+            0.000473542,
+            0.000473893,
+            0.000457678,
+            0.000477105,
+            0.000445058,
+            0.00042927,
+            0.000436481,
+            0.000423799
+					],
+				}, {
+					label: 'Batch 10000(1000)',
+					fill: false,
+					backgroundColor: window.chartColors.blue,
+					borderColor: window.chartColors.blue,
+					data: [
+            0.000570413,
+            0.000658639,
+            0.000614075,
+            0.000552357,
+            0.000603621,
+            0.000614977,
+            0.000550043,
+            0.000550211,
+            0.000547981,
+            0.000560711
+					],
+				}, {
+					label: 'Batch 10000(2000)',
+					fill: false,
+					backgroundColor: window.chartColors.purple,
+					borderColor: window.chartColors.purple,
+					data: [
+            0.000412648,
+            0.000429586,
+            0.000486243,
+            0.000407072,
+            0.000427229,
+            0.000425955,
+            0.000404301,
+            0.000486414,
+            0.000394263,
+            0.000429401
+					],
+				}, {
+					label: 'Batch 10000(5000)',
+					fill: false,
+					backgroundColor: window.chartColors.grey,
+					borderColor: window.chartColors.grey,
+					data: [
+            0.000345229,
+            0.000320003,
+            0.000360711,
+            0.000338687,
+            0.00033399,
+            0.000354791,
+            0.000319769,
+            0.000294646,
+            0.00036952,
+            0.000323571
+					],
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Performance Test of Batch and No-Batch JDBC Requests'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Loop Index'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Average Time Cost Between 2 Successful Requests'
+						}
+					}]
+				}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+		};
+
+		document.getElementById('randomizeData').addEventListener('click', function() {
+			config.data.datasets.forEach(function(dataset) {
+				dataset.data = dataset.data.map(function() {
+					return randomScalingFactor();
+				});
+
+			});
+
+			window.myLine.update();
+		});
+
+		var colorNames = Object.keys(window.chartColors);
+		document.getElementById('addDataset').addEventListener('click', function() {
+			var colorName = colorNames[config.data.datasets.length % colorNames.length];
+			var newColor = window.chartColors[colorName];
+			var newDataset = {
+				label: 'Dataset ' + config.data.datasets.length,
+				backgroundColor: newColor,
+				borderColor: newColor,
+				data: [],
+				fill: false
+			};
+
+			for (var index = 0; index < config.data.labels.length; ++index) {
+				newDataset.data.push(randomScalingFactor());
+			}
+
+			config.data.datasets.push(newDataset);
+			window.myLine.update();
+		});
+
+		document.getElementById('addData').addEventListener('click', function() {
+			if (config.data.datasets.length > 0) {
+				var month = MONTHS[config.data.labels.length % MONTHS.length];
+				config.data.labels.push(month);
+
+				config.data.datasets.forEach(function(dataset) {
+					dataset.data.push(randomScalingFactor());
+				});
+
+				window.myLine.update();
+			}
+		});
+
+		document.getElementById('removeDataset').addEventListener('click', function() {
+			config.data.datasets.splice(0, 1);
+			window.myLine.update();
+		});
+
+		document.getElementById('removeData').addEventListener('click', function() {
+			config.data.labels.splice(-1, 1); // remove the label first
+
+			config.data.datasets.forEach(function(dataset) {
+				dataset.data.pop();
+			});
+
+			window.myLine.update();
+		});
+	</script>
+</body>
+
+</html>

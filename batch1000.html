@@ -1,0 +1,204 @@
+
+<!doctype html>
+<html>
+
+<head>
+	<title>Line Chart</title>
+	<script src="Chart.bundle.js"></script>
+	<script src="utils.js"></script>
+	<style>
+	canvas{
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+</head>
+
+<body>
+	<div style="width:75%;">
+		<canvas id="canvas"></canvas>
+	</div>
+	<br>
+	<br>
+	<!-- <button id="randomizeData">Randomize Data</button>
+	<button id="addDataset">Add Dataset</button>
+	<button id="removeDataset">Remove Dataset</button>
+	<button id="addData">Add Data</button>
+	<button id="removeData">Remove Data</button> -->
+	<script>
+		var LOOP = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+		var config = {
+			type: 'line',
+			data: {
+				labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+				datasets: [{
+					label: 'No Batch 1000',
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: [
+            0.000203201,
+            0.000207614,
+            0.000235383,
+            0.000232202,
+            0.000261222,
+            0.000232034,
+            0.000218944,
+            0.000226342,
+            0.000247268,
+            0.000239337
+					],
+					fill: false,
+				}, {
+					label: 'Batch 1000(10)',
+					fill: false,
+					backgroundColor: window.chartColors.green,
+					borderColor: window.chartColors.green,
+					data: [
+            0.000299568,
+            0.000401855,
+            0.000401637,
+            0.000354213,
+            0.000386442,
+            0.00039044,
+            0.000337308,
+            0.000383492,
+            0.000431384,
+            0.000416491
+					],
+				}, {
+					label: 'Batch 1000(100)',
+					fill: false,
+					backgroundColor: window.chartColors.orange,
+					borderColor: window.chartColors.orange,
+					data: [
+            0.000475612,
+            0.000432494,
+            0.000456198,
+            0.000450132,
+            0.000421385,
+            0.000438994,
+            0.0004329,
+            0.000431938,
+            0.000454751,
+            0.000412984
+					],
+				}, {
+					label: 'Batch 1000(500)',
+					fill: false,
+					backgroundColor: window.chartColors.yellow,
+					borderColor: window.chartColors.yellow,
+					data: [
+            0.000233705,
+            0.000264601,
+            0.00032356,
+            0.000264873,
+            0.000291543,
+            0.000300184,
+            0.000354286,
+            0.000266031,
+            0.000287664,
+            0.000310906
+					],
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Performance Test of Batch and No-Batch JDBC Requests'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Loop Index'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Average Time Cost Between 2 Successful Requests'
+						}
+					}]
+				}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+		};
+
+		document.getElementById('randomizeData').addEventListener('click', function() {
+			config.data.datasets.forEach(function(dataset) {
+				dataset.data = dataset.data.map(function() {
+					return randomScalingFactor();
+				});
+
+			});
+
+			window.myLine.update();
+		});
+
+		var colorNames = Object.keys(window.chartColors);
+		document.getElementById('addDataset').addEventListener('click', function() {
+			var colorName = colorNames[config.data.datasets.length % colorNames.length];
+			var newColor = window.chartColors[colorName];
+			var newDataset = {
+				label: 'Dataset ' + config.data.datasets.length,
+				backgroundColor: newColor,
+				borderColor: newColor,
+				data: [],
+				fill: false
+			};
+
+			for (var index = 0; index < config.data.labels.length; ++index) {
+				newDataset.data.push(randomScalingFactor());
+			}
+
+			config.data.datasets.push(newDataset);
+			window.myLine.update();
+		});
+
+		document.getElementById('addData').addEventListener('click', function() {
+			if (config.data.datasets.length > 0) {
+				var month = MONTHS[config.data.labels.length % MONTHS.length];
+				config.data.labels.push(month);
+
+				config.data.datasets.forEach(function(dataset) {
+					dataset.data.push(randomScalingFactor());
+				});
+
+				window.myLine.update();
+			}
+		});
+
+		document.getElementById('removeDataset').addEventListener('click', function() {
+			config.data.datasets.splice(0, 1);
+			window.myLine.update();
+		});
+
+		document.getElementById('removeData').addEventListener('click', function() {
+			config.data.labels.splice(-1, 1); // remove the label first
+
+			config.data.datasets.forEach(function(dataset) {
+				dataset.data.pop();
+			});
+
+			window.myLine.update();
+		});
+	</script>
+</body>
+
+</html>
